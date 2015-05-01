@@ -34,10 +34,13 @@
 //Object References
 @property (nonatomic, strong) CaptureSessionManager *captureManager;
 @property (nonatomic, strong) CameraShutterButton *cameraShutter;
-@property (nonatomic, strong) CameraToggleButton *cameraToggle;
-@property (nonatomic, strong) CameraFlashButton *cameraFlash;
-@property (nonatomic, strong) CameraDismissButton *cameraDismiss;
+
+@property (nonatomic, strong) UIButton *cameraToggle;
+@property (nonatomic, strong) UIButton *cameraFlash;
+@property (nonatomic, strong) UIButton *cameraDismiss;
+
 @property (nonatomic, strong) CameraFocalReticule *focalReticule;
+
 @property (nonatomic, strong) UIView *topBarView;
 
 //Temporary/Diagnostic properties
@@ -98,8 +101,14 @@
         [_captureManager addVideoPreviewLayer];
         [self.captureManager.captureSession commitConfiguration];
         
+        CGFloat topBuffer = 64.f; //20 for status bar and 44 for standard navbar height
+        CGFloat bottomBuffer = 100.f;
+        
         //Preview Layer setup
         CGRect layerRect = self.layer.bounds;
+        layerRect.origin.y = topBuffer;
+        layerRect.size.height = layerRect.size.height - (topBuffer + bottomBuffer);
+        
         [_captureManager.previewLayer setBounds:layerRect];
         [_captureManager.previewLayer setPosition:CGPointMake(CGRectGetMidX(layerRect),CGRectGetMidY(layerRect))];
         
@@ -117,6 +126,8 @@
 
 -(void)composeInterface {
     
+    [self setBackgroundColor:[UIColor blackColor]];
+    
     //Adding notifier for orientation changes
     [[NSNotificationCenter defaultCenter] addObserver:self  selector:@selector(orientationChanged:)    name:UIDeviceOrientationDidChangeNotification  object:nil];
     
@@ -126,13 +137,13 @@
     {
         //Declare the sizing of the UI elements for iPad
         shutterButtonSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * 0.1, [[UIScreen mainScreen] bounds].size.width * 0.1);
-        topBarSize        = CGSizeMake([[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height * 0.06);
+        topBarSize        = CGSizeMake([[UIScreen mainScreen] bounds].size.width, 64.f);
         barButtonItemSize = CGSizeMake([[UIScreen mainScreen] bounds].size.height * 0.04, [[UIScreen mainScreen] bounds].size.height * 0.04);
     } else
     {
         //Declare the sizing of the UI elements for iPhone
         shutterButtonSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * 0.21, [[UIScreen mainScreen] bounds].size.width * 0.21);
-        topBarSize        = CGSizeMake([[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height * 0.07);
+        topBarSize        = CGSizeMake([[UIScreen mainScreen] bounds].size.width, 64.f);
         barButtonItemSize = CGSizeMake([[UIScreen mainScreen] bounds].size.height * 0.05, [[UIScreen mainScreen] bounds].size.height * 0.05);
     }
     
@@ -144,7 +155,7 @@
         
         //Button Visual attribution
         _cameraShutter.frame = (CGRect){0,0, shutterButtonSize};
-        _cameraShutter.center = CGPointMake(self.center.x, self.center.y*1.75);
+        _cameraShutter.center = CGPointMake(self.center.x, [[UIScreen mainScreen] bounds].size.height - 50);
         _cameraShutter.tag = ShutterButtonTag;
         _cameraShutter.backgroundColor = [UIColor clearColor];
         
@@ -160,33 +171,36 @@
         
         //Setup visual attribution for bar
         _topBarView.frame  = (CGRect){0,0, topBarSize};
-        _topBarView.backgroundColor = [UIColor colorWithRed: 0.176 green: 0.478 blue: 0.529 alpha: 0.64];
+        _topBarView.backgroundColor = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 0];
         [self addSubview:_topBarView];
         
         //Add the flash button
-        _cameraFlash = [CameraFlashButton new];
+        _cameraFlash = [UIButton new];
         if (_cameraFlash) {
             _cameraFlash.frame = (CGRect){0,0, barButtonItemSize};
-            _cameraFlash.center = CGPointMake(_topBarView.center.x * 0.80, _topBarView.center.y);
+            _cameraFlash.center = CGPointMake(20, _topBarView.center.y + 10);
             _cameraFlash.tag = FlashButtonTag;
+            [_cameraFlash setBackgroundColor:[UIColor whiteColor]];
             if ( UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad ) [_topBarView addSubview:_cameraFlash];
         }
         
         //Add the camera toggle button
-        _cameraToggle = [CameraToggleButton new];
+        _cameraToggle = [UIButton new];
         if (_cameraToggle) {
             _cameraToggle.frame = (CGRect){0,0, barButtonItemSize};
-            _cameraToggle.center = CGPointMake(_topBarView.center.x * 1.20, _topBarView.center.y);
+            _cameraToggle.center = CGPointMake(_topBarView.center.x, _topBarView.center.y + 10);
             _cameraToggle.tag = ToggleButtonTag;
+            [_cameraToggle setBackgroundColor:[UIColor whiteColor]];
             [_topBarView addSubview:_cameraToggle];
         }
         
         //Add the camera dismiss button
-        _cameraDismiss = [CameraDismissButton new];
+        _cameraDismiss = [UIButton new];
         if (_cameraDismiss) {
-            _cameraDismiss.frame = (CGRect){0,0, barButtonItemSize};
-            _cameraDismiss.center = CGPointMake(20, _topBarView.center.y);
+            _cameraDismiss.frame = (CGRect){0,0, 50, 50};
+            _cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
             _cameraDismiss.tag = DismissButtonTag;
+            [_cameraDismiss setBackgroundColor:[UIColor whiteColor]];
             [_topBarView addSubview:_cameraDismiss];
         }
         
@@ -279,9 +293,11 @@
         if (tap.state == UIGestureRecognizerStateRecognized) {
             CGPoint location = [sender locationInView:self];
             
-            [self focusAtPoint:location completionHandler:^{
-                 [self animateFocusReticuleToPoint:location];
-             }];
+            if(CGRectContainsPoint(_captureManager.previewLayer.bounds, location)) {
+                [self focusAtPoint:location completionHandler:^{
+                    [self animateFocusReticuleToPoint:location];
+                }];
+            }  
         }
     }
 }
@@ -335,12 +351,12 @@
                 CGAffineTransform transform = CGAffineTransformMakeRotation( 0 );
                 
                 _cameraFlash.transform = transform;
-                _cameraFlash.center = CGPointMake(_topBarView.center.x * 0.80, _topBarView.center.y);
+                _cameraFlash.center = CGPointMake(20 , _topBarView.center.y + 10);
                 
                 _cameraToggle.transform = transform;
-                _cameraToggle.center = CGPointMake(_topBarView.center.x * 1.20, _topBarView.center.y);
+                _cameraToggle.center = CGPointMake(_topBarView.center.x, _topBarView.center.y + 10);
                 
-                _cameraDismiss.center = CGPointMake(20, _topBarView.center.y);
+                _cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
             }];
         }
             break;
@@ -351,12 +367,12 @@
                 CGAffineTransform transform = CGAffineTransformMakeRotation( M_PI_2 );
                 
                 _cameraFlash.transform = transform;
-                _cameraFlash.center = CGPointMake(_topBarView.center.x * 1.25, _topBarView.center.y);
+                _cameraFlash.center = CGPointMake(20 , _topBarView.center.y + 10);
                 
                 _cameraToggle.transform = transform;
-                _cameraToggle.center = CGPointMake(_topBarView.center.x * 1.60, _topBarView.center.y);
+                _cameraToggle.center = CGPointMake(_topBarView.center.x, _topBarView.center.y + 10);
                 
-                _cameraDismiss.center = CGPointMake(_topBarView.center.x * 0.25, _topBarView.center.y);
+                _cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
             }];
         }
             break;
@@ -367,12 +383,12 @@
                 CGAffineTransform transform = CGAffineTransformMakeRotation( - M_PI_2 );
                 
                 _cameraFlash.transform = transform;
-                _cameraFlash.center = CGPointMake(_topBarView.center.x * 0.40, _topBarView.center.y);
+                _cameraFlash.center = CGPointMake(20 , _topBarView.center.y + 10);
                 
                 _cameraToggle.transform = transform;
-                _cameraToggle.center = CGPointMake(_topBarView.center.x * 0.75, _topBarView.center.y);
+                _cameraToggle.center = CGPointMake(_topBarView.center.x, _topBarView.center.y + 10);
                 
-                _cameraDismiss.center = CGPointMake(_topBarView.center.x * 1.75, _topBarView.center.y);
+                _cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
             }];
         }
             break;

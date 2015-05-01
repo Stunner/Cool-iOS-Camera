@@ -97,8 +97,24 @@
              }
              NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
              UIImage *image = [[UIImage alloc] initWithData:imageData];
-             [self setStillImage:image];
-             [self setStillImageData:imageData];
+             
+             //here we are cropping the image...
+             //first we get the top left of the image in input device (camera) coordinates
+             //then we get the bottom right of the image in input device (camera) coordinates
+             CGPoint topLeft = [[self previewLayer] captureDevicePointOfInterestForPoint:CGPointZero];
+             CGPoint bottomRight = [[self previewLayer] captureDevicePointOfInterestForPoint:CGPointMake([self previewLayer].frame.size.width, [self previewLayer].frame.size.height)];
+             
+             //then we create a rect based off a rotation from landscape to portrait and scaled based off the captured image size
+             CGRect cropRect = CGRectMake((int)(topLeft.x*image.size.height),
+                                          (int)(bottomRight.y*image.size.width),
+                                          ((int)((bottomRight.x-topLeft.x) * (image.size.height))),
+                                          ((int)((bottomRight.y+topLeft.y) * image.size.width)));
+             
+             UIImage* croppedImage = [self cropImage:image rect:cropRect];
+             NSData* croppedImageData = UIImageJPEGRepresentation(croppedImage, 0.0);
+             
+             [self setStillImage:croppedImage];
+             [self setStillImageData:croppedImageData];
              
              if (self.delegate)
                  [self.delegate cameraSessionManagerDidCaptureImage];
@@ -110,6 +126,15 @@
     [device lockForConfiguration:nil];
     [device setTorchMode:AVCaptureTorchModeOff];
     [device unlockForConfiguration];
+}
+
+- (UIImage *)cropImage:(UIImage*)inputImage rect:(CGRect)cropRect {
+    
+    CGImageRef croppedCGImage = CGImageCreateWithImageInRect(inputImage.CGImage ,cropRect);
+    UIImage *croppedImage = [UIImage imageWithCGImage:croppedCGImage scale:1.0f orientation:inputImage.imageOrientation];
+    CGImageRelease(croppedCGImage);
+    
+    return croppedImage;
 }
 
 - (void)setEnableTorch:(BOOL)enableTorch

@@ -21,6 +21,7 @@
     
     [super viewDidLoad];
     
+    [self.view setBackgroundColor:[UIColor greenColor]];
 }
 
 - (IBAction)launchCamera:(id)sender {
@@ -70,7 +71,7 @@
 }
 
 - (BOOL)prefersStatusBarHidden {
-    return YES;
+    return NO;
 }
 
 @end
