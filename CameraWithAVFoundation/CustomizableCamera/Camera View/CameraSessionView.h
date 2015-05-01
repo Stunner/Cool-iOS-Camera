@@ -17,6 +17,13 @@
 
 @interface CameraSessionView : UIView
 
+@property (nonatomic, strong) UIColor*      viewBackgroundColor;
+
+@property (nonatomic, strong) UIButton *cameraShutter;
+@property (nonatomic, strong) UIButton *cameraToggle;
+@property (nonatomic, strong) UIButton *cameraFlash;
+@property (nonatomic, strong) UIButton *cameraDismiss;
+
 //Delegate Property
 @property (nonatomic, weak) id <CACameraSessionDelegate> delegate;
 

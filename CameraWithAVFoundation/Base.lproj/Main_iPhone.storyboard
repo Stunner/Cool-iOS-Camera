@@ -18,11 +18,12 @@
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kgW-qW-zBu" customClass="LaunchCameraButton">
                                 <rect key="frame" x="38" y="239" width="245" height="90"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="245" id="TSR-8N-lOS"/>
                                     <constraint firstAttribute="height" constant="90" id="nFO-M9-typ"/>
                                 </constraints>
-                                <state key="normal">
+                                <state key="normal" title="Launch">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>

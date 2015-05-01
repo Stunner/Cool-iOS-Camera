@@ -9,11 +9,7 @@
 #import "CaptureSessionManager.h"
 #import <ImageIO/ImageIO.h>
 
-//Custom UI classes
-#import "CameraShutterButton.h"
-#import "CameraToggleButton.h"
-#import "CameraFlashButton.h"
-#import "CameraDismissButton.h"
+//Custom UI classesdrawLaunchCameraWithFrame
 #import "CameraFocalReticule.h"
 #import "Constants.h"
 
@@ -33,11 +29,6 @@
 
 //Object References
 @property (nonatomic, strong) CaptureSessionManager *captureManager;
-@property (nonatomic, strong) CameraShutterButton *cameraShutter;
-
-@property (nonatomic, strong) UIButton *cameraToggle;
-@property (nonatomic, strong) UIButton *cameraFlash;
-@property (nonatomic, strong) UIButton *cameraDismiss;
 
 @property (nonatomic, strong) CameraFocalReticule *focalReticule;
 
@@ -56,6 +47,8 @@
         _animationInProgress = NO;
         [self setupCaptureManager:RearFacingCamera];
         cameraBeingUsed = RearFacingCamera;
+        self.viewBackgroundColor = [UIColor blackColor];
+        
         [self composeInterface];
         
         [[_captureManager captureSession] startRunning];
@@ -69,7 +62,10 @@
         _animationInProgress = NO;
         [self setupCaptureManager:RearFacingCamera];
         cameraBeingUsed = RearFacingCamera;
+        self.viewBackgroundColor = [UIColor blackColor];
+        
         [self composeInterface];
+        
         
         [[_captureManager captureSession] startRunning];
     }
@@ -126,7 +122,7 @@
 
 -(void)composeInterface {
     
-    [self setBackgroundColor:[UIColor blackColor]];
+    [self setBackgroundColor:self.viewBackgroundColor];
     
     //Adding notifier for orientation changes
     [[NSNotificationCenter defaultCenter] addObserver:self  selector:@selector(orientationChanged:)    name:UIDeviceOrientationDidChangeNotification  object:nil];
@@ -149,77 +145,83 @@
     
     
     //Create shutter button
-    _cameraShutter = [CameraShutterButton new];
+    self.cameraShutter = [UIButton new];
     
     if (_captureManager) {
         
         //Button Visual attribution
-        _cameraShutter.frame = (CGRect){0,0, shutterButtonSize};
-        _cameraShutter.center = CGPointMake(self.center.x, [[UIScreen mainScreen] bounds].size.height - 50);
-        _cameraShutter.tag = ShutterButtonTag;
-        _cameraShutter.backgroundColor = [UIColor clearColor];
+        self.cameraShutter.frame = (CGRect){0,0, shutterButtonSize};
+        self.cameraShutter.center = CGPointMake(self.center.x, [[UIScreen mainScreen] bounds].size.height - 50);
+        self.cameraShutter.tag = ShutterButtonTag;
+        self.cameraShutter.backgroundColor = [UIColor clearColor];
+        [self.cameraShutter setBackgroundImage:[UIImage imageNamed:@"scanbutton"] forState:UIControlStateNormal];
         
         //Button target
-        [_cameraShutter addTarget:self action:@selector(inputManager:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:_cameraShutter];
+        [self.cameraShutter addTarget:self action:@selector(inputManager:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:self.cameraShutter];
     }
     
     //Create the top bar and add the buttons to it
-    _topBarView = [UIView new];
+    self.topBarView = [UIView new];
     
-    if (_topBarView) {
+    if (self.topBarView) {
         
         //Setup visual attribution for bar
-        _topBarView.frame  = (CGRect){0,0, topBarSize};
-        _topBarView.backgroundColor = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 0];
-        [self addSubview:_topBarView];
+        self.topBarView.frame  = (CGRect){0,0, topBarSize};
+        self.topBarView.backgroundColor = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 0];
+        [self addSubview:self.topBarView];
         
         //Add the flash button
-        _cameraFlash = [UIButton new];
-        if (_cameraFlash) {
-            _cameraFlash.frame = (CGRect){0,0, barButtonItemSize};
-            _cameraFlash.center = CGPointMake(20, _topBarView.center.y + 10);
-            _cameraFlash.tag = FlashButtonTag;
-            [_cameraFlash setBackgroundColor:[UIColor whiteColor]];
-            if ( UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad ) [_topBarView addSubview:_cameraFlash];
+        self.cameraFlash = [UIButton new];
+        if (self.cameraFlash) {
+            
+            [self.cameraFlash setBackgroundColor:[UIColor whiteColor]];
+            
+            self.cameraFlash.frame = (CGRect){0,0, barButtonItemSize};
+            self.cameraFlash.center = CGPointMake(20, self.topBarView.center.y + 10);
+            self.cameraFlash.tag = FlashButtonTag;
+            if ( UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad ) [self.topBarView addSubview:self.cameraFlash];
         }
         
         //Add the camera toggle button
-        _cameraToggle = [UIButton new];
-        if (_cameraToggle) {
-            _cameraToggle.frame = (CGRect){0,0, barButtonItemSize};
-            _cameraToggle.center = CGPointMake(_topBarView.center.x, _topBarView.center.y + 10);
-            _cameraToggle.tag = ToggleButtonTag;
-            [_cameraToggle setBackgroundColor:[UIColor whiteColor]];
-            [_topBarView addSubview:_cameraToggle];
+        self.cameraToggle = [UIButton new];
+        if (self.cameraToggle) {
+            
+            [self.cameraToggle setBackgroundColor:[UIColor whiteColor]];
+            
+            self.cameraToggle.frame = (CGRect){0,0, barButtonItemSize};
+            self.cameraToggle.center = CGPointMake(self.topBarView.center.x, self.topBarView.center.y + 10);
+            self.cameraToggle.tag = ToggleButtonTag;
+            [self.topBarView addSubview:self.cameraToggle];
         }
         
         //Add the camera dismiss button
-        _cameraDismiss = [UIButton new];
-        if (_cameraDismiss) {
-            _cameraDismiss.frame = (CGRect){0,0, 50, 50};
-            _cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
-            _cameraDismiss.tag = DismissButtonTag;
-            [_cameraDismiss setBackgroundColor:[UIColor whiteColor]];
-            [_topBarView addSubview:_cameraDismiss];
+        self.cameraDismiss = [UIButton new];
+        if (self.cameraDismiss) {
+            
+            [self.cameraDismiss setBackgroundColor:[UIColor whiteColor]];
+            
+            self.cameraDismiss.frame = (CGRect){0,0, barButtonItemSize};
+            self.cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
+            self.cameraDismiss.tag = DismissButtonTag;
+            [self.topBarView addSubview:self.cameraDismiss];
         }
         
         //Attribute and configure all buttons in the bar's subview
         for (UIButton *button in _topBarView.subviews) {
-            button.backgroundColor = [UIColor clearColor];
             [button addTarget:self action:@selector(inputManager:) forControlEvents:UIControlEventTouchUpInside];
         }
     }
     
     //Create the focus reticule UIView
-    _focalReticule = [CameraFocalReticule new];
+    self.focalReticule = [CameraFocalReticule new];
     
-    if (_focalReticule) {
+    if (self.focalReticule) {
         
-        _focalReticule.frame = (CGRect){0,0, 60, 60};
-        _focalReticule.backgroundColor = [UIColor clearColor];
-        _focalReticule.hidden = YES;
-        [self addSubview:_focalReticule];
+        self.focalReticule.frame = (CGRect){0,0, 60, 60};
+        self.focalReticule.backgroundColor = [UIColor clearColor];
+        self.focalReticule.hidden = YES;
+        [self addSubview:self.focalReticule];
     }
     
     //Create the gesture recognizer for the focus tap
@@ -265,15 +267,21 @@
     if (cameraBeingUsed == RearFacingCamera) {
         [self setupCaptureManager:FrontFacingCamera];
         cameraBeingUsed = FrontFacingCamera;
-        [self composeInterface];
+        //[self composeInterface];
         [[_captureManager captureSession] startRunning];
-        _cameraFlash.hidden = YES;
+        
+        [self.cameraFlash setHidden:YES];
+        
+        
     } else {
         [self setupCaptureManager:RearFacingCamera];
         cameraBeingUsed = RearFacingCamera;
-        [self composeInterface];
+        //[self composeInterface];
         [[_captureManager captureSession] startRunning];
-        _cameraFlash.hidden = NO;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.cameraFlash setHidden:NO];
+        });
     }
 }
 
