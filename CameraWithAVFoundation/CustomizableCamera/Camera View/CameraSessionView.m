@@ -175,36 +175,33 @@
         self.cameraFlash = [UIButton new];
         if (self.cameraFlash) {
             
-            [self.cameraFlash setBackgroundColor:[UIColor whiteColor]];
-            
             self.cameraFlash.frame = (CGRect){0,0, barButtonItemSize};
             self.cameraFlash.center = CGPointMake(20, self.topBarView.center.y + 10);
             self.cameraFlash.tag = FlashButtonTag;
             if ( UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad ) [self.topBarView addSubview:self.cameraFlash];
+            
         }
         
         //Add the camera toggle button
         self.cameraToggle = [UIButton new];
         if (self.cameraToggle) {
             
-            [self.cameraToggle setBackgroundColor:[UIColor whiteColor]];
-            
             self.cameraToggle.frame = (CGRect){0,0, barButtonItemSize};
             self.cameraToggle.center = CGPointMake(self.topBarView.center.x, self.topBarView.center.y + 10);
             self.cameraToggle.tag = ToggleButtonTag;
             [self.topBarView addSubview:self.cameraToggle];
+            
         }
         
         //Add the camera dismiss button
         self.cameraDismiss = [UIButton new];
         if (self.cameraDismiss) {
             
-            [self.cameraDismiss setBackgroundColor:[UIColor whiteColor]];
-            
             self.cameraDismiss.frame = (CGRect){0,0, barButtonItemSize};
             self.cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
             self.cameraDismiss.tag = DismissButtonTag;
             [self.topBarView addSubview:self.cameraDismiss];
+            
         }
         
         //Attribute and configure all buttons in the bar's subview
