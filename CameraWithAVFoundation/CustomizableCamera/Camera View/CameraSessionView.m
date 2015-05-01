@@ -178,7 +178,11 @@
             self.cameraFlash.frame = (CGRect){0,0, barButtonItemSize};
             self.cameraFlash.center = CGPointMake(20, self.topBarView.center.y + 10);
             self.cameraFlash.tag = FlashButtonTag;
-            if ( UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad ) [self.topBarView addSubview:self.cameraFlash];
+            self.cameraFlash.backgroundColor = [UIColor clearColor];
+            
+            if ( UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad ){
+                [self.topBarView addSubview:self.cameraFlash];
+            }
             
         }
         
@@ -189,6 +193,8 @@
             self.cameraToggle.frame = (CGRect){0,0, barButtonItemSize};
             self.cameraToggle.center = CGPointMake(self.topBarView.center.x, self.topBarView.center.y + 10);
             self.cameraToggle.tag = ToggleButtonTag;
+            self.cameraToggle.backgroundColor = [UIColor clearColor];
+            
             [self.topBarView addSubview:self.cameraToggle];
             
         }
@@ -200,6 +206,8 @@
             self.cameraDismiss.frame = (CGRect){0,0, barButtonItemSize};
             self.cameraDismiss.center = CGPointMake([[UIScreen mainScreen] bounds].size.width - 20, _topBarView.center.y + 10);
             self.cameraDismiss.tag = DismissButtonTag;
+            self.cameraDismiss.backgroundColor = [UIColor clearColor];
+            
             [self.topBarView addSubview:self.cameraDismiss];
             
         }
