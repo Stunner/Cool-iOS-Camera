@@ -64,6 +64,14 @@
     //[self.cameraView removeFromSuperview];
 }
 
+- (void)didPressCloseButton:(id)sender {
+    [UIView animateWithDuration:0.3 animations:^{
+        self.cameraView.center = CGPointMake(self.cameraView.center.x, self.cameraView.center.y*3);
+    } completion:^(BOOL finished) {
+        [self.cameraView removeFromSuperview];
+    }];
+}
+
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
 {
     //Show error alert if image could not be saved

@@ -12,6 +12,7 @@
 
 @optional - (void)didCaptureImage:(UIImage *)image;
 @optional - (void)didCaptureImageWithData:(NSData *)imageData;
+@optional - (void)didPressCloseButton:(id)sender;
 
 @end
 

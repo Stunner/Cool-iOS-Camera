@@ -291,12 +291,9 @@
 }
 
 - (void)onTapDismissButton {
-    [UIView animateWithDuration:0.3 animations:^{
-        self.center = CGPointMake(self.center.x, self.center.y*3);
-    } completion:^(BOOL finished) {
-        [_captureManager stop];
-        [self removeFromSuperview];
-    }];
+    if([self.delegate respondsToSelector:@selector(didPressCloseButton:)]) {
+        [self.delegate didPressCloseButton:self];
+    }
 }
 
 - (void)focusGesture:(id)sender {
@@ -485,6 +482,7 @@
 }
 
 -(void)viewDidDisappear:(BOOL)animated{
+    [_captureManager stop];
     [[NSNotificationCenter defaultCenter]removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 

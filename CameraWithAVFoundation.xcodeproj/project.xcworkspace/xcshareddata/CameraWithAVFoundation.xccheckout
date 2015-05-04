@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>853933A2-74E6-4670-B8C8-6C678A500714</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>CameraWithAVFoundation</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>1E2D9AB4D12F5456C8B9E64BC180A40234B44345</key>
 		<string>https://github.com/Stunner/Cool-iOS-Camera.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>CameraWithAVFoundation.xcodeproj/project.xcworkspace</string>
+	<string>CameraWithAVFoundation.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>1E2D9AB4D12F5456C8B9E64BC180A40234B44345</key>
